@@ -1,0 +1,18 @@
+[tool.poetry]
+name = "zixingimghosting"
+version = "0.1.0"
+description = ""
+authors = ["zeusho <zeus@smallho.cn>"]
+readme = "README.md"
+
+[tool.poetry.dependencies]
+python = "^3.12"
+python-dotenv = "^1.0.1"
+django = "^5.1.1"
+django-ninja-extra = "^0.21.4"
+django-debug-toolbar = "^4.4.6"
+
+
+[build-system]
+requires = ["poetry-core"]
+build-backend = "poetry.core.masonry.api"
