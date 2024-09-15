@@ -18,12 +18,15 @@ from django.urls import path, include, re_path
 from application import settings
 from application.admin import admin_site
 from apps.api import ninja_api
-from apps.walrus.views import index_view
+from apps.walrus.views import index_view, show_upload, upload_handle
 
 urlpatterns = [
     path("", index_view),
     path("api/", ninja_api.urls),
     path("d_admin/", admin_site.urls),
+
+    path('show_upload/', show_upload),  # 图片上传页
+    path('upload_handle/', upload_handle),  # 图片上传处理页
 ]
 
 if settings.DEBUG:
