@@ -53,6 +53,11 @@ def upload_handle(request):
     return HttpResponse('上传成功，图片地址：walrus/%s' % pic.name)
 
 
+def list_files(request):
+    files = list(WalrusFile.objects.all().values('key', 'content_type', 'size', 'remark', 'created'))
+    return APIResponse(code=0, msg='', data={'list': files})
+
+
 def upload_walrus_handle(request):
     # 获取remark字段
     remark = request.POST.get('remark', '')  # 默认为空字符串

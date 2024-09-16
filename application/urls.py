@@ -18,7 +18,7 @@ from django.urls import path, include, re_path
 from application import settings
 from application.admin import admin_site
 from apps.api import ninja_api
-from apps.walrus.views import index_view, show_upload, upload_handle, upload_walrus_handle
+from apps.walrus.views import index_view, show_upload, upload_handle, upload_walrus_handle, list_files
 
 urlpatterns = [
     path("", index_view),
@@ -28,6 +28,7 @@ urlpatterns = [
     path('show_upload/', show_upload),  # 图片上传页
     path('upload_handle/', upload_handle),  # 图片上传处理页
     path('upload_walrus_handle/', upload_walrus_handle),  # 图片上传处理页
+    path('img/list/', list_files),  # 返回全部图片接口
 ]
 
 if settings.DEBUG:
