@@ -61,7 +61,7 @@ def upload_walrus_handle(request):
         # 检查文件大小是否超过10MB
         if pic.size > MAX_FILE_SIZE:
             # return JsonResponse({'status': 'failed', 'error': 'File size exceeds 10MB limit'}, status=400)
-            return HttpResponse(f'File size exceeds 10MB limit')
+            return APIResponse(code=403, msg='File size exceeds 10MB limit')
 
         resp_json = send_file_to_remote_server(pic)
         print(resp_json)
@@ -73,15 +73,12 @@ def upload_walrus_handle(request):
         '''
         if 'alreadyCertified' in resp_json:  # 图片已存在
             blob_id = jmespath.search("alreadyCertified.blobId", resp_json)
-            return HttpResponse(f'上传成功，图片id：{blob_id}')
+            # return HttpResponse(f'上传成功，图片id：{blob_id}')
+            return APIResponse(code=0, msg='', data={'blob_id': blob_id})
         elif 'newlyCreated' in resp_json:
             blob_id = jmespath.search("newlyCreated.blobObject.blobId", resp_json)
-            return HttpResponse(f'上传成功，图片id：{blob_id}')
+            return APIResponse(code=0, msg='', data={'blob_id': blob_id})
 
-        return HttpResponse(f'返回异常 请联系管理员')
+        return APIResponse(code=500, msg='failed resp,please contact author')
 
-    # 【4】保存图片路径到数据库，此处只保存其相对上传目录的路径
-    # PicTest.objects.create(pic='static/walrus/%s' % pic.name)
-
-    # 【5】别忘记返回信息
-    return HttpResponse('上传成功，图片地址：walrus/%s' % pic.name)
+    return APIResponse(code=500, msg='plsease provide img file')
