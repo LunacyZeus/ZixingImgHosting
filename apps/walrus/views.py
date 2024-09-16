@@ -54,7 +54,13 @@ def upload_handle(request):
 
 
 def upload_walrus_handle(request):
+    # 获取remark字段
+    remark = request.POST.get('remark', '')  # 默认为空字符串
+
     pic = request.FILES['pic']
+
+    if len(remark) >= 128:
+        return APIResponse(code=403, msg='remark too long')
 
     if pic:
         content_type = pic.content_type
@@ -81,7 +87,7 @@ def upload_walrus_handle(request):
         else:
             return APIResponse(code=500, msg='failed resp,please contact author')
 
-        obj = WalrusFile.objects.create(key=blob_id, size=pic.size, content_type=content_type)
+        obj = WalrusFile.objects.create(key=blob_id, size=pic.size, content_type=content_type, remark=remark)
         obj_id = obj.id
 
         return APIResponse(code=0, msg='', data={'blob_id': blob_id, 'obj_id': obj_id})
