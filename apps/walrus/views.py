@@ -1,9 +1,14 @@
+import jmespath
 from django.http import HttpResponse
 from django.shortcuts import render
 
 from application.settings import MEDIA_ROOT
 from apps.walrus.models import PicTest
 from pkg.response.response import APIResponse
+from pkg.utils.http.walrus.web import send_file_to_remote_server
+
+# 定义文件大小限制，10MB
+MAX_FILE_SIZE = 10 * 1024 * 1024  # 10MB
 
 
 # Create your views here.
@@ -43,6 +48,40 @@ def upload_handle(request):
 
     # 【4】保存图片路径到数据库，此处只保存其相对上传目录的路径
     PicTest.objects.create(pic='static/walrus/%s' % pic.name)
+
+    # 【5】别忘记返回信息
+    return HttpResponse('上传成功，图片地址：walrus/%s' % pic.name)
+
+
+def upload_walrus_handle(request):
+    pic = request.FILES['pic']
+
+    if pic:
+
+        # 检查文件大小是否超过10MB
+        if pic.size > MAX_FILE_SIZE:
+            # return JsonResponse({'status': 'failed', 'error': 'File size exceeds 10MB limit'}, status=400)
+            return HttpResponse(f'File size exceeds 10MB limit')
+
+        resp_json = send_file_to_remote_server(pic)
+        print(resp_json)
+        # {'alreadyCertified': {'blobId': '3XclPOZhFmt0JarSQrWO8kc8Nm_5ewUHbLBdM5VrUWw', 'event': {'txDigest': 'DHtz5Sb4xUoyeYWmmnY76xV1c26EcxNHPRGKeqTF7H2r', 'eventSeq': '0'}, 'endEpoch': 5}}
+        '''
+        {'newlyCreated': {'blobObject': {'id': '0x4a3d2c7eab6ad0498b7b8d4aac287bb02073779ae4599b36e49b2656493d83ba', 'storedEpoch': 0, 'blobId': '8igW-1ivpxEazhuMm7V9Brg_5I8ykVgV1eaXaj6HQgI', 
+'size': 1082394, 'erasureCodeType': 'RedStuff', 'certifiedEpoch': 0, 'storage': {'id': '0x9b15940e5232476299e43d03432513183fc819d5c19bfabc1e4eb93e7658f4eb', 'startEpoch': 0, 'endEpoch'
+: 5, 'storageSize': 68987000}}, 'encodedSize': 68987000, 'cost': 16842750}}
+        '''
+        if 'alreadyCertified' in resp_json:  # 图片已存在
+            blob_id = jmespath.search("alreadyCertified.blobId", resp_json)
+            return HttpResponse(f'上传成功，图片id：{blob_id}')
+        elif 'newlyCreated' in resp_json:
+            blob_id = jmespath.search("newlyCreated.blobObject.blobId", resp_json)
+            return HttpResponse(f'上传成功，图片id：{blob_id}')
+
+        return HttpResponse(f'返回异常 请联系管理员')
+
+    # 【4】保存图片路径到数据库，此处只保存其相对上传目录的路径
+    # PicTest.objects.create(pic='static/walrus/%s' % pic.name)
 
     # 【5】别忘记返回信息
     return HttpResponse('上传成功，图片地址：walrus/%s' % pic.name)

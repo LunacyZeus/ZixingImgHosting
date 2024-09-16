@@ -7,7 +7,7 @@
 
 	<!-- 【1】图片上传必须要设置enctype="multipart/form-data"，
 	后台才能接收到数据 -->
-	<form method='post' enctype="multipart/form-data" action="/upload_handle/">
+	<form method='post' enctype="multipart/form-data" action="/upload_walrus_handle/">
 		{% csrf_token %} {# 带上验证标识 #}
 		<input type="file" name="pic"><br/>
 		<input type="submit" value="上传">

@@ -1,0 +1,20 @@
+{
+	'newlyCreated': {
+		'blobObject': {
+			'id': '0x4a3d2c7eab6ad0498b7b8d4aac287bb02073779ae4599b36e49b2656493d83ba',
+			'storedEpoch': 0,
+			'blobId': '8igW-1ivpxEazhuMm7V9Brg_5I8ykVgV1eaXaj6HQgI',
+			'size': 1082394,
+			'erasureCodeType': 'RedStuff',
+			'certifiedEpoch': 0,
+			'storage': {
+				'id': '0x9b15940e5232476299e43d03432513183fc819d5c19bfabc1e4eb93e7658f4eb',
+				'startEpoch': 0,
+				'endEpoch': 5,
+				'storageSize': 68987000
+			}
+		},
+		'encodedSize': 68987000,
+		'cost': 16842750
+	}
+}
