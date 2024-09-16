@@ -11,7 +11,20 @@ class PicTestAdmin(admin.ModelAdmin):
         "pic",
         "created",
     )
-    #search_fields = ("container_name", "container_code")
+    # search_fields = ("container_name", "container_code")
+    list_filter = (
+        "created",
+    )
+    actions = []
+
+
+class WalrusFileAdmin(admin.ModelAdmin):
+    list_display = (
+        "key",
+        "content_type",
+        "created",
+    )
+    # search_fields = ("container_name", "container_code")
     list_filter = (
         "created",
     )
@@ -19,3 +32,4 @@ class PicTestAdmin(admin.ModelAdmin):
 
 
 admin_site.register(models.PicTest, PicTestAdmin)
+admin_site.register(models.WalrusFile, WalrusFileAdmin)

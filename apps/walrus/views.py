@@ -3,7 +3,7 @@ from django.http import HttpResponse
 from django.shortcuts import render
 
 from application.settings import MEDIA_ROOT
-from apps.walrus.models import PicTest
+from apps.walrus.models import PicTest, WalrusFile
 from pkg.response.response import APIResponse
 from pkg.utils.http.walrus.web import send_file_to_remote_server
 
@@ -57,14 +57,15 @@ def upload_walrus_handle(request):
     pic = request.FILES['pic']
 
     if pic:
-
+        content_type = pic.content_type
         # 检查文件大小是否超过10MB
         if pic.size > MAX_FILE_SIZE:
             # return JsonResponse({'status': 'failed', 'error': 'File size exceeds 10MB limit'}, status=400)
             return APIResponse(code=403, msg='File size exceeds 10MB limit')
 
         resp_json = send_file_to_remote_server(pic)
-        print(resp_json)
+        # print(resp_json)
+        print(content_type)
         # {'alreadyCertified': {'blobId': '3XclPOZhFmt0JarSQrWO8kc8Nm_5ewUHbLBdM5VrUWw', 'event': {'txDigest': 'DHtz5Sb4xUoyeYWmmnY76xV1c26EcxNHPRGKeqTF7H2r', 'eventSeq': '0'}, 'endEpoch': 5}}
         '''
         {'newlyCreated': {'blobObject': {'id': '0x4a3d2c7eab6ad0498b7b8d4aac287bb02073779ae4599b36e49b2656493d83ba', 'storedEpoch': 0, 'blobId': '8igW-1ivpxEazhuMm7V9Brg_5I8ykVgV1eaXaj6HQgI', 
@@ -74,11 +75,15 @@ def upload_walrus_handle(request):
         if 'alreadyCertified' in resp_json:  # 图片已存在
             blob_id = jmespath.search("alreadyCertified.blobId", resp_json)
             # return HttpResponse(f'上传成功，图片id：{blob_id}')
-            return APIResponse(code=0, msg='', data={'blob_id': blob_id})
         elif 'newlyCreated' in resp_json:
             blob_id = jmespath.search("newlyCreated.blobObject.blobId", resp_json)
-            return APIResponse(code=0, msg='', data={'blob_id': blob_id})
 
-        return APIResponse(code=500, msg='failed resp,please contact author')
+        else:
+            return APIResponse(code=500, msg='failed resp,please contact author')
+
+        obj = WalrusFile.objects.create(key=blob_id, size=pic.size, content_type=content_type)
+        obj_id = obj.id
+
+        return APIResponse(code=0, msg='', data={'blob_id': blob_id, 'obj_id': obj_id})
 
     return APIResponse(code=500, msg='plsease provide img file')
